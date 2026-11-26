@@ -1,0 +1,2573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trạng Nguyên Toán Học – Lớp 4 | Tìm Hai Số Khi Biết Tổng Và Hiệu</title>
+<!-- Firebase SDK (Compat CDN cho file HTML độc lập trên GitHub Pages) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<style>
+  :root {
+    --red-main: #c81d25;
+    --red-dark: #8e1118;
+    --gold-main: #f59e0b;
+    --gold-light: #fef08a;
+    --gold-bright: #facc15;
+    --green-main: #16a34a;
+    --green-dark: #15803d;
+    --blue-main: #0284c7;
+    --blue-dark: #0369a1;
+    --cream-bg: #fffbeb;
+    --card-bg: #ffffff;
+    --text-dark: #1e293b;
+    --text-muted: #475569;
+    --shadow-lg: 0 12px 30px rgba(142, 17, 24, 0.16);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input, textarea {
+    user-select: text !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 42%, #dcfce7 75%, #bbf7d0 100%);
+    min-height: 100vh;
+    color: var(--text-dark);
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .bg-scenery {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .app-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 16px 20px 36px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Top Control Bar */
+  .top-utility {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .school-pill {
+    background: rgba(255, 255, 255, 0.92);
+    border: 2px solid var(--gold-main);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--red-dark);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .audio-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn-icon {
+    background: #fff;
+    border: 2px solid var(--gold-main);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--red-dark);
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .btn-icon:hover {
+    transform: translateY(-2px);
+    background: var(--gold-light);
+  }
+
+  /* Screens */
+  .screen {
+    display: none;
+    animation: fadeSlideIn 0.4s ease;
+  }
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* INTRO SCREEN */
+  .intro-card {
+    background: linear-gradient(180deg, #fffdf5 0%, #fff7ed 100%);
+    border: 5px solid var(--red-main);
+    border-radius: 28px;
+    box-shadow: var(--shadow-lg), inset 0 0 0 4px var(--gold-bright);
+    padding: 26px 28px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .couplet {
+    position: absolute;
+    top: 24px;
+    bottom: 24px;
+    width: 44px;
+    background: linear-gradient(180deg, #b91c1c, #991b1b);
+    border: 2px solid var(--gold-bright);
+    border-radius: 10px;
+    color: #fef08a;
+    font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .couplet.left { left: 16px; }
+  .couplet.right { right: 16px; }
+
+  @media (max-width: 820px) {
+    .couplet { display: none; }
+  }
+
+  .intro-inner {
+    max-width: 740px;
+    margin: 0 auto;
+  }
+
+  .round-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--red-main), #e11d48);
+    color: #fef08a;
+    border: 2px solid var(--gold-bright);
+    padding: 7px 24px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.6px;
+    box-shadow: 0 4px 12px rgba(200, 29, 37, 0.28);
+    margin-bottom: 10px;
+  }
+
+  .main-title {
+    margin: 8px 0 4px;
+    font-size: clamp(26px, 4.2vw, 42px);
+    font-weight: 900;
+    color: var(--red-main);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 3px 0 #fde047, 0 5px 12px rgba(142, 17, 24, 0.18);
+    line-height: 1.18;
+  }
+
+  .sub-grade-badge {
+    display: inline-block;
+    background: var(--blue-main);
+    color: #fff;
+    font-weight: 800;
+    font-size: 17px;
+    padding: 5px 20px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    box-shadow: 0 3px 0 var(--blue-dark);
+  }
+
+  /* Contest Status Banner */
+  .contest-status-bar {
+    background: #eff6ff;
+    border: 2px solid var(--blue-main);
+    border-radius: 16px;
+    padding: 10px 16px;
+    margin: 0 auto 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--blue-dark);
+  }
+  .contest-status-bar.waiting {
+    background: #fefce8;
+    border-color: var(--gold-main);
+    color: #92400e;
+  }
+  .contest-status-bar.ended {
+    background: #fef2f2;
+    border-color: var(--red-main);
+    color: var(--red-dark);
+  }
+  .status-pill {
+    background: #ffffff;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .mascot-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin: 6px 0 14px;
+  }
+
+  /* Login Form Box */
+  .login-box {
+    background: #ffffff;
+    border: 3px solid var(--gold-main);
+    border-radius: 20px;
+    padding: 18px 22px;
+    margin: 0 auto 18px;
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.18);
+    text-align: left;
+  }
+  .login-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--red-dark);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .login-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) {
+    .login-grid { grid-template-columns: 1fr; }
+  }
+  .login-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .login-input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-dark);
+    background: #fffbeb;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .login-input:focus {
+    border-color: var(--red-main);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(200, 29, 37, 0.14);
+  }
+  .login-note {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .login-error {
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 800;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .rounds-preview {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .round-chip {
+    background: #f0fdf4;
+    border: 2px solid var(--green-main);
+    color: var(--green-dark);
+    border-radius: 14px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .btn-start {
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+    color: #fff;
+    border: 3px solid #fef08a;
+    border-radius: 999px;
+    padding: 15px 42px;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 7px 0 #15803d, 0 12px 24px rgba(22, 163, 74, 0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.8px;
+  }
+  .btn-start:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 0 #15803d, 0 16px 28px rgba(22, 163, 74, 0.42);
+  }
+  .btn-start:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 4px 0 #15803d;
+  }
+  .btn-start:disabled {
+    background: #94a3b8;
+    box-shadow: 0 5px 0 #64748b;
+    cursor: not-allowed;
+  }
+  .btn-start.waiting-mode:disabled {
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+    box-shadow: 0 5px 0 #92400e;
+    color: #fff;
+  }
+
+  /* GAMEPLAY SCREEN */
+  .hud-panel {
+    background: #ffffff;
+    border: 3px solid var(--red-main);
+    border-radius: 20px;
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .round-tag {
+    background: linear-gradient(90deg, var(--red-main), #dc2626);
+    color: #fef08a;
+    font-weight: 800;
+    font-size: 15px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 2px solid var(--gold-bright);
+  }
+
+  .hud-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 6px 14px;
+    font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stat-pill.player {
+    background: #fff1f2;
+    border-color: #fda4af;
+    color: var(--red-dark);
+  }
+  .stat-pill.score {
+    background: #fefce8;
+    border-color: var(--gold-main);
+    color: #b45309;
+  }
+  .stat-pill.timer {
+    background: #eff6ff;
+    border-color: var(--blue-main);
+    color: var(--blue-dark);
+    min-width: 112px;
+    justify-content: center;
+  }
+
+  .progress-wrap {
+    width: 100%;
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 6.66%;
+    background: linear-gradient(90deg, var(--gold-main), var(--green-main));
+    border-radius: 999px;
+    transition: width 0.35s ease;
+  }
+
+  /* Question Card */
+  .question-card {
+    background: #ffffff;
+    border: 4px solid var(--gold-main);
+    border-radius: 24px;
+    padding: 24px 26px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+  }
+
+  .q-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .q-number-badge {
+    background: var(--blue-main);
+    color: #fff;
+    font-weight: 900;
+    font-size: 18px;
+    padding: 6px 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 0 var(--blue-dark);
+  }
+
+  .q-type-hint {
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid #f59e0b;
+  }
+
+  .q-prompt {
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.45;
+    margin-bottom: 16px;
+  }
+
+  .q-passage {
+    background: #fffbeb;
+    border-left: 5px solid var(--gold-main);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 19px;
+    line-height: 1.6;
+    color: #1e293b;
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+
+  /* TYPE 1: FILL IN THE BLANK */
+  .fill-stage {
+    background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+    border: 3px dashed var(--gold-main);
+    border-radius: 20px;
+    padding: 26px 20px;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  .idiom-display {
+    font-size: clamp(22px, 3.4vw, 32px);
+    font-weight: 900;
+    color: var(--red-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .blank-input {
+    width: 140px;
+    height: 54px;
+    font-size: 26px;
+    font-weight: 900;
+    text-align: center;
+    color: var(--blue-dark);
+    background: #ffffff;
+    border: 3px solid var(--blue-main);
+    border-radius: 14px;
+    outline: none;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .blank-input.short {
+    width: 88px;
+  }
+  .blank-input:focus {
+    border-color: var(--red-main);
+    box-shadow: 0 0 0 4px rgba(200, 29, 37, 0.16);
+  }
+  .blank-input.correct {
+    border-color: var(--green-main);
+    background: #dcfce7;
+    color: var(--green-dark);
+  }
+  .blank-input.wrong {
+    border-color: #dc2626;
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .attached-word {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* TYPE 2: INTERACTIVE MATCHING */
+  .match-board {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 90px 1fr;
+    align-items: center;
+    gap: 10px;
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 700px) {
+    .match-board {
+      grid-template-columns: 1fr 48px 1fr;
+      padding: 12px 8px;
+    }
+  }
+
+  .match-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 2;
+  }
+
+  .match-item {
+    background: #ffffff;
+    border: 3px solid #94a3b8;
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 4px 0 #cbd5e1;
+  }
+
+  .match-item.target-left {
+    background: #fefce8;
+    border-color: var(--gold-main);
+    color: var(--red-dark);
+    box-shadow: 0 4px 0 #d97706;
+  }
+
+  .match-item.distractor-left {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #64748b;
+    cursor: default;
+    opacity: 0.78;
+    box-shadow: none;
+  }
+
+  .match-item.right-option:hover:not(.disabled) {
+    border-color: var(--blue-main);
+    background: #e0f2fe;
+    transform: translateY(-2px);
+  }
+
+  .match-item.selected {
+    border-color: var(--blue-main);
+    background: #bae6fd;
+    box-shadow: 0 4px 0 var(--blue-dark);
+  }
+
+  .match-item.matched-ok {
+    border-color: var(--green-main);
+    background: #dcfce7;
+    color: var(--green-dark);
+    box-shadow: 0 4px 0 var(--green-dark);
+  }
+
+  .match-item.matched-err {
+    border-color: #dc2626;
+    background: #fee2e2;
+    color: #991b1b;
+    box-shadow: 0 4px 0 #991b1b;
+  }
+
+  .match-svg-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* TYPE 3: MULTIPLE CHOICE GRID */
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 680px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+
+  .option-btn {
+    background: #f8fafc;
+    border: 3px solid #cbd5e1;
+    border-radius: 18px;
+    padding: 15px 18px;
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--text-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    box-shadow: 0 4px 0 #cbd5e1;
+    transition: all 0.15s;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    background: #eff6ff;
+    border-color: var(--blue-main);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--blue-main);
+  }
+
+  .option-letter {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--blue-main);
+    color: #fff;
+    font-weight: 900;
+    font-size: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .option-btn.selected {
+    background: #fef9c3;
+    border-color: var(--gold-main);
+    box-shadow: 0 4px 0 #d97706;
+  }
+  .option-btn.selected .option-letter {
+    background: var(--gold-main);
+  }
+
+  .option-btn.correct {
+    background: #dcfce7;
+    border-color: var(--green-main);
+    color: var(--green-dark);
+    box-shadow: 0 4px 0 var(--green-dark);
+  }
+  .option-btn.correct .option-letter {
+    background: var(--green-main);
+  }
+
+  .option-btn.wrong {
+    background: #fee2e2;
+    border-color: #dc2626;
+    color: #991b1b;
+    box-shadow: 0 4px 0 #991b1b;
+  }
+  .option-btn.wrong .option-letter {
+    background: #dc2626;
+  }
+
+  /* TYPE 4: SORTING & DRAG-DROP WORD TILES */
+  .sort-slots {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 640px) {
+    .sort-slots { grid-template-columns: 1fr; }
+  }
+
+  .sort-slot {
+    background: #fffbeb;
+    border: 3px dashed var(--gold-main);
+    border-radius: 16px;
+    min-height: 74px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+  }
+  .sort-slot.filled {
+    border-style: solid;
+    background: #e0f2fe;
+    border-color: var(--blue-main);
+  }
+  .sort-slot-num {
+    font-size: 12px;
+    font-weight: 900;
+    color: #92400e;
+    margin-bottom: 4px;
+  }
+  .sort-slot-val {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--blue-dark);
+  }
+
+  .tile-bank {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .word-tile {
+    background: linear-gradient(180deg, #fef08a 0%, #facc15 100%);
+    border: 3px solid #ca8a04;
+    border-radius: 16px;
+    padding: 12px 22px;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--red-dark);
+    cursor: grab;
+    box-shadow: 0 5px 0 #a16207;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .word-tile:hover:not(.used) {
+    transform: translateY(-3px);
+  }
+  .word-tile.used {
+    opacity: 0.35;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Action Submit Button */
+  .action-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn-submit {
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+    color: #fff;
+    border: 3px solid #fef08a;
+    border-radius: 999px;
+    padding: 13px 34px;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #92400e;
+    transition: transform 0.15s;
+  }
+  .btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+  .btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Feedback Banner */
+  .feedback-box {
+    margin-top: 16px;
+    border-radius: 18px;
+    padding: 16px 20px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    animation: popIn 0.25s ease;
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.94); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .feedback-box.success {
+    display: flex;
+    background: #dcfce7;
+    border: 3px solid var(--green-main);
+    color: var(--green-dark);
+  }
+
+  .feedback-box.error {
+    display: flex;
+    background: #fee2e2;
+    border: 3px solid #dc2626;
+    color: #991b1b;
+  }
+
+  .feedback-msg {
+    font-size: 20px;
+    font-weight: 900;
+  }
+  .feedback-sub {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .btn-next {
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    color: #fff;
+    border: 2px solid #bae6fd;
+    border-radius: 999px;
+    padding: 11px 26px;
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #075985;
+  }
+
+  /* SUMMARY & LEADERBOARD SCREEN */
+  .golden-board {
+    background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+    border: 6px solid var(--red-main);
+    border-radius: 30px;
+    box-shadow: var(--shadow-lg), inset 0 0 0 5px var(--gold-bright);
+    padding: 28px 26px 34px;
+    text-align: center;
+    position: relative;
+  }
+
+  .honor-title {
+    font-size: clamp(24px, 3.8vw, 36px);
+    font-weight: 900;
+    color: var(--red-main);
+    text-shadow: 0 2px 0 #fde047;
+    margin: 6px 0;
+  }
+
+  .rank-banner {
+    display: inline-block;
+    background: linear-gradient(90deg, #b91c1c, #dc2626, #b91c1c);
+    color: #fef08a;
+    border: 3px solid var(--gold-bright);
+    border-radius: 18px;
+    padding: 10px 26px;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 900;
+    margin: 10px 0 16px;
+    box-shadow: 0 8px 20px rgba(185, 28, 28, 0.3);
+    letter-spacing: 0.6px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 820px;
+    margin: 0 auto 20px;
+  }
+
+  @media (max-width: 680px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .sum-card {
+    background: #ffffff;
+    border: 2px solid var(--gold-main);
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+  .sum-card .lbl {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .sum-card .val {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--red-dark);
+    margin-top: 4px;
+  }
+  .sum-card.good .val { color: var(--green-dark); }
+  .sum-card.bad .val { color: #dc2626; }
+  .sum-card.blue .val { color: var(--blue-dark); }
+
+  /* Leaderboard Table */
+  .leaderboard-box {
+    max-width: 860px;
+    margin: 22px auto 0;
+    background: #ffffff;
+    border: 3px solid var(--gold-main);
+    border-radius: 20px;
+    padding: 18px 20px;
+    text-align: left;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  }
+  .lb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .lb-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--red-dark);
+  }
+  .lb-sub {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .lb-table-wrap {
+    overflow-x: auto;
+  }
+  .lb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .lb-table th {
+    background: #fef3c7;
+    color: var(--red-dark);
+    font-weight: 900;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--gold-main);
+  }
+  .lb-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+  }
+  .lb-table tr.me-row {
+    background: #eff6ff;
+  }
+  .lb-table tr.perfect-row td:first-child {
+    color: #b45309;
+  }
+  .badge-perfect {
+    display: inline-block;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #16a34a;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .badge-attempts {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .review-list {
+    max-width: 860px;
+    margin: 18px auto 0;
+    text-align: left;
+    background: #fff;
+    border: 2px solid var(--gold-main);
+    border-radius: 18px;
+    padding: 16px 20px;
+    max-height: 340px;
+    overflow-y: auto;
+    display: none;
+  }
+  .review-list.open {
+    display: block;
+  }
+  .review-row {
+    padding: 10px 0;
+    border-bottom: 1px dashed #cbd5e1;
+    font-size: 16px;
+  }
+  .review-row:last-child { border-bottom: none; }
+
+  .sync-badge {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #475569;
+  }
+  .sync-badge.ok {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  .sync-badge.err {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+
+  /* Fireworks Canvas */
+  #fireworksCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fireworksCanvas"></canvas>
+
+<!-- Offline SVG Background Scenery -->
+<div class="bg-scenery" aria-hidden="true">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" width="100%" height="100%">
+    <circle cx="1260" cy="120" r="56" fill="#fde047" opacity="0.85" />
+    <g fill="#ffffff" opacity="0.75">
+      <ellipse cx="220" cy="110" rx="75" ry="26" />
+      <ellipse cx="270" cy="102" rx="55" ry="24" />
+      <ellipse cx="980" cy="95" rx="85" ry="25" />
+      <ellipse cx="1040" cy="90" rx="50" ry="20" />
+    </g>
+    <path d="M520 560 Q720 490 920 560 L890 580 Q720 520 550 580 Z" fill="#b91c1c" opacity="0.22" />
+    <path d="M560 520 Q720 465 880 520 L860 536 Q720 488 580 536 Z" fill="#b91c1c" opacity="0.28" />
+    <path d="M0 680 Q360 610 720 670 T1440 650 L1440 900 L0 900 Z" fill="#86efac" opacity="0.65" />
+    <path d="M0 730 Q480 680 960 735 T1440 715 L1440 900 L0 900 Z" fill="#4ade80" opacity="0.55" />
+    <g transform="translate(110, 790)">
+      <ellipse cx="0" cy="24" rx="68" ry="18" fill="#15803d" opacity="0.7" />
+      <path d="M0 15 C-18 -18 -34 -8 -18 16 Z" fill="#f472b6" />
+      <path d="M0 15 C18 -18 34 -8 18 16 Z" fill="#f472b6" />
+      <path d="M0 15 C-12 -28 12 -28 0 16 Z" fill="#ec4899" />
+    </g>
+    <g transform="translate(1310, 800)">
+      <ellipse cx="0" cy="24" rx="72" ry="18" fill="#15803d" opacity="0.7" />
+      <path d="M0 15 C-18 -18 -34 -8 -18 16 Z" fill="#f472b6" />
+      <path d="M0 15 C18 -18 34 -8 18 16 Z" fill="#f472b6" />
+      <path d="M0 15 C-12 -28 12 -28 0 16 Z" fill="#ec4899" />
+    </g>
+  </svg>
+</div>
+
+<div class="app-container">
+  <!-- Top Bar (Chỉ dành cho học sinh, không có nút điều khiển giáo viên) -->
+  <div class="top-utility">
+    <div class="school-pill">
+      <span>🏮</span>
+      <span>TRẠNG NGUYÊN TOÁN HỌC • KHỐI 4 PHCL</span>
+    </div>
+    <div class="audio-controls">
+      <button class="btn-icon" onclick="openLeaderboardOnly()">🏆 Bảng xếp hạng</button>
+      <button class="btn-icon" id="btnToggleMusic" onclick="toggleMusic()">🎵 Nhạc nền: Bật</button>
+      <button class="btn-icon" id="btnToggleSfx" onclick="toggleSfx()">🔊 Âm thanh: Bật</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: INTRO & LOGIN -->
+  <section id="screenIntro" class="screen active">
+    <div class="intro-card">
+      <div class="couplet left" aria-hidden="true">
+        <span>TÍNH</span><span>NHANH</span><span>HIỂU</span><span>SÂU</span><span>ĐỖ</span><span>TRẠNG</span><span>NGUYÊN</span>
+      </div>
+      <div class="couplet right" aria-hidden="true">
+        <span>TỔNG</span><span>HIỆU</span><span>RÕ</span><span>RÀNG</span><span>RẠNG</span><span>BẢNG</span><span>VÀNG</span>
+      </div>
+
+      <div class="intro-inner">
+        <div class="round-badge">CHINH PHỤC TOÁN LỚP 4 • KẾT NỐI TRI THỨC</div>
+        <h1 class="main-title">TRẠNG NGUYÊN TOÁN HỌC</h1>
+        <div class="sub-grade-badge">CHỦ ĐỀ: TÌM HAI SỐ KHI BIẾT TỔNG VÀ HIỆU • 15 CÂU HỎI</div>
+
+        <!-- Contest Goal & Teacher Room Status -->
+        <div class="contest-status-bar waiting" id="introContestStatus">
+          <span id="introContestText">⏳ <strong>ĐANG CHỜ GIÁO VIÊN PHÁT ĐỀ...</strong> Con hãy nhập Họ tên và Lớp để sẵn sàng nhé!</span>
+          <span class="status-pill" id="introPerfectCount">Đã đạt 100%: 0 / 6 bạn</span>
+        </div>
+
+        <!-- Inline SVG Mascots -->
+        <div class="mascot-row">
+          <svg width="92" height="92" viewBox="0 0 120 120" aria-label="Chú Trạng Nguyên">
+            <rect x="28" y="24" width="64" height="22" rx="8" fill="#1e293b" />
+            <rect x="10" y="34" width="22" height="8" rx="4" fill="#1e293b" stroke="#facc15" stroke-width="2" />
+            <rect x="88" y="34" width="22" height="8" rx="4" fill="#1e293b" stroke="#facc15" stroke-width="2" />
+            <circle cx="60" cy="34" r="6" fill="#facc15" />
+            <circle cx="60" cy="60" r="22" fill="#fde68a" />
+            <circle cx="52" cy="57" r="3" fill="#1e293b" />
+            <circle cx="68" cy="57" r="3" fill="#1e293b" />
+            <path d="M53 66 Q60 73 67 66" stroke="#c81d25" stroke-width="3" fill="none" stroke-linecap="round" />
+            <path d="M32 108 C32 84 88 84 88 108 Z" fill="#c81d25" stroke="#facc15" stroke-width="3" />
+            <path d="M52 84 L60 98 L68 84" fill="#facc15" />
+            <line x1="92" y1="62" x2="82" y2="104" stroke="#92400e" stroke-width="4" stroke-linecap="round" />
+            <path d="M92 62 Q98 48 94 46 Q87 52 92 62 Z" fill="#1e293b" />
+          </svg>
+
+          <svg width="84" height="84" viewBox="0 0 100 100" aria-label="Bảng Vàng Toán Học">
+            <rect x="16" y="14" width="68" height="50" rx="10" fill="#facc15" stroke="#b45309" stroke-width="4" />
+            <rect x="24" y="22" width="52" height="34" rx="6" fill="#fef9c3" />
+            <text x="50" y="44" text-anchor="middle" font-size="14" font-weight="900" fill="#b91c1c">BẢNG VÀNG</text>
+            <path d="M20 74 Q35 66 50 74 Q65 66 80 74 L80 90 Q65 82 50 90 Q35 82 20 90 Z" fill="#ffffff" stroke="#0284c7" stroke-width="3" />
+            <line x1="50" y1="74" x2="50" y2="90" stroke="#0284c7" stroke-width="2" />
+          </svg>
+        </div>
+
+        <!-- Student Login Form -->
+        <div class="login-box">
+          <div class="login-title">
+            <span>✍️ ĐĂNG NHẬP THÍ SINH</span>
+            <span class="sync-badge" id="introSyncBadge">⏳ Đang kết nối máy chủ...</span>
+          </div>
+          <div class="login-grid">
+            <div class="login-field">
+              <label for="inputStudentName">Họ và tên học sinh *</label>
+              <input type="text" id="inputStudentName" class="login-input" placeholder="Ví dụ: Nguyễn Minh Anh" maxlength="40" autocomplete="off" />
+            </div>
+            <div class="login-field">
+              <label for="inputStudentClass">Lớp</label>
+              <input type="text" id="inputStudentClass" class="login-input" placeholder="Ví dụ: 4A" maxlength="12" autocomplete="off" />
+            </div>
+          </div>
+          <div class="login-note">
+            💡 Khi giáo viên bấm <strong>Phát đề</strong>, nút Bắt đầu thi sẽ tự động mở sáng cho cả lớp • Bảng xếp hạng tính theo <strong>kết quả lượt chơi cuối cùng</strong>.
+          </div>
+          <div class="login-error" id="loginError">⚠️ Con hãy nhập Họ và tên trước khi bắt đầu thi nhé!</div>
+        </div>
+
+        <div class="rounds-preview">
+          <div class="round-chip">🐔 Vòng 1: Gà Uyên Bác (Câu 1–5)</div>
+          <div class="round-chip">🐓 Vòng 2: Gà Dũng Cảm (Câu 6–10)</div>
+          <div class="round-chip">📜 Vòng 3: Bảng Vàng Trạng Nguyên (Câu 11–15)</div>
+        </div>
+
+        <button class="btn-start waiting-mode" id="btnStartGame" onclick="startGame()" disabled>⏳ CHỜ GIÁO VIÊN PHÁT ĐỀ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: GAMEPLAY -->
+  <section id="screenGame" class="screen">
+    <div class="hud-panel">
+      <div class="hud-top">
+        <div class="round-tag" id="hudRoundName">VÒNG 1: GÀ UYÊN BÁC</div>
+        <div class="hud-stats">
+          <div class="stat-pill player">
+            <span>👤</span>
+            <span id="hudPlayerName">Học sinh</span>
+          </div>
+          <div class="stat-pill">
+            <span>📋 Câu:</span>
+            <span id="hudProgressText">1 / 15</span>
+          </div>
+          <div class="stat-pill score">
+            <span>⭐ Điểm:</span>
+            <span id="hudScore">0</span>
+          </div>
+          <div class="stat-pill timer" id="hudTimerBox">
+            <span>⏱️</span>
+            <span id="hudElapsed">00:00</span>
+          </div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-fill" id="hudProgressBar"></div>
+      </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="q-header">
+        <div class="q-number-badge" id="qNumberLabel">Câu 1</div>
+        <div class="q-type-hint" id="qTypeLabel">Hoàn thành công thức</div>
+      </div>
+
+      <div class="q-prompt" id="qPrompt"></div>
+      <div id="qPassageBox"></div>
+      <div id="qInteractiveArea"></div>
+
+      <div class="action-row" id="qActionRow">
+        <button class="btn-submit" id="btnCheckAnswer" onclick="submitCurrentAnswer()">✔ Trả lời</button>
+      </div>
+
+      <div class="feedback-box" id="feedbackBox">
+        <div>
+          <div class="feedback-msg" id="feedbackMsg"></div>
+          <div class="feedback-sub" id="feedbackSub"></div>
+        </div>
+        <button class="btn-next" id="btnNextQuestion" onclick="nextQuestion()">Câu tiếp theo ➔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: SUMMARY & LEADERBOARD -->
+  <section id="screenSummary" class="screen">
+    <div class="golden-board">
+      <div class="round-badge" id="summaryTopBadge">🏆 BẢNG VÀNG VINH DANH TRẠNG NGUYÊN 🏆</div>
+      <h2 class="honor-title" id="summaryMainHeading">CHÚC MỪNG CON ĐÃ HOÀN THÀNH LƯỢT THI!</h2>
+      <div class="rank-banner" id="sumRankTitle">TRẠNG NGUYÊN XUẤT SẮC</div>
+
+      <div class="contest-status-bar" id="summaryContestStatus" style="max-width: 820px;">
+        <span id="summaryGoalText">🎯 Tiến độ cuộc thi: Cần 6 học sinh đạt 100% để kết thúc.</span>
+        <span class="status-pill" id="summaryPerfectCount">Đã đạt 100%: 0 / 6 bạn</span>
+      </div>
+
+      <div class="summary-grid" id="personalStatsGrid">
+        <div class="sum-card">
+          <div class="lbl">Thí sinh (Lượt cuối)</div>
+          <div class="val" id="sumPlayerName">—</div>
+        </div>
+        <div class="sum-card blue">
+          <div class="lbl">Tổng điểm</div>
+          <div class="val" id="sumScore">0 / 150</div>
+        </div>
+        <div class="sum-card good">
+          <div class="lbl">Số câu đúng</div>
+          <div class="val" id="sumCorrect">0 / 15 câu</div>
+        </div>
+        <div class="sum-card bad">
+          <div class="lbl">Số câu chưa đúng</div>
+          <div class="val" id="sumWrong">0 câu</div>
+        </div>
+        <div class="sum-card">
+          <div class="lbl">Số lần đã thi</div>
+          <div class="val" id="sumAttempts">1 lần</div>
+        </div>
+        <div class="sum-card blue">
+          <div class="lbl">Thời gian hoàn thành</div>
+          <div class="val" id="sumTotalTime">00 phút 00 giây</div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn-start" id="btnPlayAgain" onclick="backToIntro()">🔄 LÀM LẠI LƯỢT MỚI</button>
+        <button class="btn-submit" id="btnToggleReview" onclick="toggleReviewList()">📖 Xem lại 15 câu</button>
+      </div>
+
+      <!-- LIVE LEADERBOARD -->
+      <div class="leaderboard-box">
+        <div class="lb-header">
+          <div>
+            <div class="lb-title">📊 BẢNG XẾP HẠNG LỚP (TÍNH THEO LƯỢT CHƠI CUỐI CÙNG)</div>
+            <div class="lb-sub">Tiêu chí xếp hạng: 1. Điểm số cao nhất ➔ 2. Thời gian hoàn thành nhanh nhất</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="sync-badge" id="syncStatusBadge">⏳ Đang kết nối...</span>
+          </div>
+        </div>
+        <div class="lb-table-wrap">
+          <table class="lb-table">
+            <thead>
+              <tr>
+                <th style="width:85px;">Hạng</th>
+                <th>Họ và tên</th>
+                <th>Lớp</th>
+                <th>Điểm (Lượt cuối)</th>
+                <th>Thời gian</th>
+                <th>Số lượt</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <tr><td colspan="7" style="text-align:center; color:#64748b;">Đang tải dữ liệu bảng xếp hạng...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="review-list" id="reviewList"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ============================================================================
+// 0. CẤU HÌNH FIREBASE REALTIME DATABASE (BẢN HỌC SINH - CHỈ ĐỌC TRẠNG THÁI)
+// ============================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCGkdfqodYMOFDXujl7W0iyj6ZxVEQwl1w",
+  authDomain: "tuyen172108833.firebaseapp.com",
+  databaseURL: "https://tuyen172108833-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "tuyen172108833",
+  storageBucket: "tuyen172108833.firebasestorage.app",
+  messagingSenderId: "1099302136135",
+  appId: "1:1099302136135:web:8fb721b9cf90a49330c462",
+  measurementId: "G-BZ8GZBYCPJ"
+};
+
+let db = null;
+let studentsRef = null;
+let controlStatusRef = null;
+try {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  db = firebase.database();
+  studentsRef = db.ref("toan4_tong_hieu/students");
+  controlStatusRef = db.ref("toan4_tong_hieu/control/status");
+} catch (err) {
+  console.error("Lỗi khởi tạo Firebase:", err);
+}
+
+const STORAGE_KEY = "TOAN_4_TONG_HIEU_FIREBASE_CACHE_V4";
+const TARGET_PERFECT_STUDENTS = 6;
+const MAX_SCORE = 150;
+
+// ============================================================================
+// 1. DỮ LIỆU 15 CÂU HỎI: TÌM HAI SỐ KHI BIẾT TỔNG VÀ HIỆU CỦA HAI SỐ ĐÓ
+// ============================================================================
+const QUESTIONS = [
+  {
+    id: 1,
+    round: "VÒNG 1: GÀ UYÊN BÁC",
+    type: "drag_blank",
+    typeLabel: "Kéo thả dấu phép tính vào công thức",
+    prompt: "Em hãy kéo thả (hoặc bấm chọn) dấu phép tính thích hợp để hoàn thành công thức tìm Số bé:",
+    beforeText: "Số bé = (Tổng",
+    afterText: "Hiệu) : 2",
+    tiles: ["-", "+", "×", ":"],
+    correctTile: "-",
+    fullDisplay: "Số bé = (Tổng - Hiệu) : 2"
+  },
+  {
+    id: 2,
+    round: "VÒNG 1: GÀ UYÊN BÁC",
+    type: "drag_blank",
+    typeLabel: "Kéo thả số thích hợp vào công thức",
+    prompt: "Em hãy kéo thả (hoặc bấm chọn) số thích hợp để hoàn thành công thức tìm Số lớn:",
+    beforeText: "Số lớn = (Tổng + Hiệu) :",
+    afterText: "",
+    tiles: ["2", "3", "4", "1"],
+    correctTile: "2",
+    fullDisplay: "Số lớn = (Tổng + Hiệu) : 2"
+  },
+  {
+    id: 3,
+    round: "VÒNG 1: GÀ UYÊN BÁC",
+    type: "fill",
+    typeLabel: "Điền số thích hợp vào ô trống",
+    prompt: "Hai chị em Mi và Mai có tất cả 25 cái kẹo, Mi có nhiều hơn Mai 5 cái kẹo. Khi đưa cho Mi 5 cái kẹo rồi, thì tổng số kẹo còn lại là bao nhiêu?",
+    parts: ["Tổng số kẹo còn lại là:", { blank: true, answers: ["20"], suffix: "cái kẹo", short: true }],
+    fullDisplay: "20 cái kẹo (25 - 5 = 20)"
+  },
+  {
+    id: 4,
+    round: "VÒNG 1: GÀ UYÊN BÁC",
+    type: "fill",
+    typeLabel: "Tính nhẩm và điền số thích hợp",
+    prompt: "Biết Tổng của hai số là 20, Hiệu của hai số là 6. Em hãy tìm Số lớn:",
+    parts: ["Số lớn là:", { blank: true, answers: ["13"], short: true }],
+    fullDisplay: "Số lớn = (20 + 6) : 2 = 13"
+  },
+  {
+    id: 5,
+    round: "VÒNG 1: GÀ UYÊN BÁC",
+    type: "fill",
+    typeLabel: "Tính nhẩm và điền số thích hợp",
+    prompt: "Biết Tổng của hai số là 30, Hiệu của hai số là 10. Em hãy tìm Số bé:",
+    parts: ["Số bé là:", { blank: true, answers: ["10"], short: true }],
+    fullDisplay: "Số bé = (30 - 10) : 2 = 10"
+  },
+  {
+    id: 6,
+    round: "VÒNG 2: GÀ DŨNG CẢM",
+    type: "match",
+    typeLabel: "Ghép nối dữ kiện với kết quả đúng",
+    prompt: "Em hãy nối ô nổi bật bên trái với kết quả đúng bên phải:",
+    leftTarget: "Tổng = 18, Hiệu = 4",
+    leftOthers: ["Tổng = 18, Hiệu = 10", "Tổng = 18, Hiệu = 2"],
+    rightCorrect: "Số lớn là 11, số bé là 7",
+    rightDistractors: ["Số lớn là 14, số bé là 4", "Số lớn là 10, số bé là 8"],
+    fullDisplay: "Số lớn = (18 + 4) : 2 = 11; Số bé = 11 - 4 = 7"
+  },
+  {
+    id: 7,
+    round: "VÒNG 2: GÀ DŨNG CẢM",
+    type: "match",
+    typeLabel: "Ghép nối bài toán Khám phá với đáp số",
+    prompt: "Nối bài toán ở phần Khám phá bên trái với đáp số đúng bên phải:",
+    leftTarget: "Mi và Mai có 25 cái kẹo, Mi hơn Mai 5 cái",
+    leftOthers: ["Tổng bằng 25, Hiệu bằng 15", "Tổng bằng 25, Hiệu bằng 3"],
+    rightCorrect: "Mi có 15 cái kẹo, Mai có 10 cái kẹo",
+    rightDistractors: ["Mi có 20 cái kẹo, Mai có 5 cái kẹo", "Mi có 14 cái kẹo, Mai có 11 cái kẹo"],
+    fullDisplay: "Mi có 15 cái kẹo, Mai có 10 cái kẹo"
+  },
+  {
+    id: 8,
+    round: "VÒNG 2: GÀ DŨNG CẢM",
+    type: "match",
+    typeLabel: "Ghép nối Bài 1 Luyện tập với đáp số",
+    prompt: "Nối đề Bài 1 (Luyện tập) bên trái với tuổi của bố và con bên phải:",
+    leftTarget: "Tổng tuổi bố và con là 58, bố hơn con 38 tuổi",
+    leftOthers: ["Tổng là 58, hiệu là 18", "Tổng là 58, hiệu là 28"],
+    rightCorrect: "Bố 48 tuổi, con 10 tuổi",
+    rightDistractors: ["Bố 38 tuổi, con 20 tuổi", "Bố 43 tuổi, con 15 tuổi"],
+    fullDisplay: "Bố: (58 + 38) : 2 = 48 (tuổi); Con: 48 - 38 = 10 (tuổi)"
+  },
+  {
+    id: 9,
+    round: "VÒNG 2: GÀ DŨNG CẢM",
+    type: "match",
+    typeLabel: "Ghép nối Bài 2 Luyện tập với đáp số",
+    prompt: "Nối đề Bài 2 (Luyện tập) bên trái với số học sinh nam và nữ bên phải:",
+    leftTarget: "Lớp có 28 học sinh, nam nhiều hơn nữ 4 em",
+    leftOthers: ["Lớp có 28 em, nam hơn nữ 8 em", "Lớp có 28 em, nam hơn nữ 2 em"],
+    rightCorrect: "16 học sinh nam, 12 học sinh nữ",
+    rightDistractors: ["18 học sinh nam, 10 học sinh nữ", "15 học sinh nam, 13 học sinh nữ"],
+    fullDisplay: "Số HS nam: (28 + 4) : 2 = 16 (em); Số HS nữ: 16 - 4 = 12 (em)"
+  },
+  {
+    id: 10,
+    round: "VÒNG 2: GÀ DŨNG CẢM",
+    type: "match",
+    typeLabel: "Ghép nối bài toán tìm hai số chẵn",
+    prompt: "Hai số chẵn liên tiếp hơn kém nhau 2 đơn vị. Hãy nối dữ kiện bên trái với hai số cần tìm:",
+    leftTarget: "Tổng hai số chẵn liên tiếp bằng 22",
+    leftOthers: ["Tổng hai số chẵn liên tiếp bằng 26", "Tổng hai số chẵn liên tiếp bằng 18"],
+    rightCorrect: "Hai số đó là 10 và 12",
+    rightDistractors: ["Hai số đó là 12 và 14", "Hai số đó là 8 và 10"],
+    fullDisplay: "Hiệu = 2; Số bé = (22 - 2) : 2 = 10; Số lớn = 12"
+  },
+  {
+    id: 11,
+    round: "VÒNG 3: BẢNG VÀNG TRẠNG NGUYÊN",
+    type: "mcq",
+    typeLabel: "Vận dụng công thức tìm Số bé",
+    prompt: "Tổng của hai số là 45, hiệu của hai số là 9. Số bé là bao nhiêu?",
+    options: ["27", "18", "36", "54"],
+    correctIndex: 1,
+    fullDisplay: "B. 18 — Vì Số bé = (45 - 9) : 2 = 18"
+  },
+  {
+    id: 12,
+    round: "VÒNG 3: BẢNG VÀNG TRẠNG NGUYÊN",
+    type: "mcq",
+    typeLabel: "Giải toán có lời văn (Hình học)",
+    prompt: "Một hình chữ nhật có nửa chu vi (tổng chiều dài và chiều rộng) là 36 cm. Chiều dài hơn chiều rộng 8 cm. Chiều dài của hình chữ nhật đó là:",
+    options: ["14 cm", "28 cm", "22 cm", "44 cm"],
+    correctIndex: 2,
+    fullDisplay: "C. 22 cm — Vì Chiều dài (Số lớn) = (36 + 8) : 2 = 22 (cm)"
+  },
+  {
+    id: 13,
+    round: "VÒNG 3: BẢNG VÀNG TRẠNG NGUYÊN",
+    type: "sort",
+    typeLabel: "Sắp xếp các bước giải theo thứ tự đúng",
+    prompt: "Em hãy kéo thả (hoặc bấm chọn) các bước giải bài toán theo Cách 1 (Tìm số bé trước) theo đúng thứ tự từ Bước 1 đến Bước 4:",
+    tiles: [
+      "Tìm số bé",
+      "Tìm hai lần số bé (Tổng - Hiệu)",
+      "Tìm số lớn",
+      "Xác định Tổng và Hiệu"
+    ],
+    correctOrder: [
+      "Xác định Tổng và Hiệu",
+      "Tìm hai lần số bé (Tổng - Hiệu)",
+      "Tìm số bé",
+      "Tìm số lớn"
+    ],
+    fullDisplay: "1. Xác định Tổng và Hiệu ➔ 2. Tìm hai lần số bé ➔ 3. Tìm số bé ➔ 4. Tìm số lớn"
+  },
+  {
+    id: 14,
+    round: "VÒNG 3: BẢNG VÀNG TRẠNG NGUYÊN",
+    type: "mcq",
+    typeLabel: "Bài toán có hiệu ẩn",
+    prompt: "Hai anh em có tất cả 40 viên bi. Nếu anh cho em 3 viên bi thì số bi của hai anh em bằng nhau. Hỏi lúc đầu anh có bao nhiêu viên bi?",
+    options: ["23 viên bi", "26 viên bi", "17 viên bi", "20 viên bi"],
+    correctIndex: 0,
+    fullDisplay: "A. 23 viên bi — Anh cho em 3 viên thì bằng nhau nên anh hơn em: 3 + 3 = 6 (viên). Lúc đầu anh có: (40 + 6) : 2 = 23 (viên)"
+  },
+  {
+    id: 15,
+    round: "VÒNG 3: BẢNG VÀNG TRẠNG NGUYÊN",
+    type: "mcq",
+    typeLabel: "Kết hợp Trung bình cộng và Tổng – Hiệu",
+    prompt: "Trung bình cộng của hai số là 15, hiệu của hai số đó là 4. Hai số cần tìm là:",
+    options: ["19 và 11", "17 và 13", "18 và 12", "20 và 10"],
+    correctIndex: 1,
+    fullDisplay: "B. 17 và 13 — Tổng hai số là: 15 × 2 = 30. Số lớn = (30 + 4) : 2 = 17; Số bé = 17 - 4 = 13"
+  }
+];
+
+// ============================================================================
+// 2. HỆ THỐNG ÂM THANH & NHẠC NỀN OFFLINE (WEB AUDIO API)
+// ============================================================================
+let audioCtx = null;
+let musicEnabled = true;
+let sfxEnabled = true;
+let bgmInterval = null;
+let bgmStep = 0;
+
+function ensureAudio() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) audioCtx = new AudioContext();
+  }
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+}
+
+function playTone(freq, duration, type = "sine", gainVal = 0.08, delay = 0) {
+  if (!sfxEnabled) return;
+  ensureAudio();
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime + delay;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, now);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(gainVal, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + duration + 0.03);
+}
+
+function sfxClick() { playTone(587.33, 0.09, "triangle", 0.07); }
+function sfxWin() {
+  [523.25, 659.25, 783.99, 1046.5].forEach((n, i) => playTone(n, 0.28, "triangle", 0.11, i * 0.1));
+}
+function sfxLose() {
+  playTone(330, 0.22, "sine", 0.08, 0);
+  playTone(261.63, 0.35, "sine", 0.08, 0.18);
+}
+
+const PENTATONIC_MELODY = [
+  523.25, 587.33, 659.25, 783.99, 659.25, 587.33, 523.25, 392.00,
+  440.00, 523.25, 587.33, 659.25, 587.33, 523.25, 440.00, 523.25
+];
+
+function startBgm() {
+  stopBgm();
+  bgmStep = 0;
+  bgmInterval = setInterval(() => {
+    if (!musicEnabled) return;
+    ensureAudio();
+    if (!audioCtx || audioCtx.state !== "running") return;
+    const freq = PENTATONIC_MELODY[bgmStep % PENTATONIC_MELODY.length];
+    bgmStep++;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.025, now + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.48);
+  }, 520);
+}
+
+function stopBgm() {
+  if (bgmInterval) {
+    clearInterval(bgmInterval);
+    bgmInterval = null;
+  }
+}
+
+function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  document.getElementById("btnToggleMusic").textContent = musicEnabled ? "🎵 Nhạc nền: Bật" : "🔇 Nhạc nền: Tắt";
+  if (musicEnabled) ensureAudio();
+}
+
+function toggleSfx() {
+  sfxEnabled = !sfxEnabled;
+  document.getElementById("btnToggleSfx").textContent = sfxEnabled ? "🔊 Âm thanh: Bật" : "🔈 Âm thanh: Tắt";
+}
+
+// ============================================================================
+// 3. HIỆU ỨNG PHÁO HOA (CANVAS FIREWORKS)
+// ============================================================================
+const fwCanvas = document.getElementById("fireworksCanvas");
+const fwCtx = fwCanvas.getContext("2d");
+let particles = [];
+let fwAnimId = null;
+
+function resizeFwCanvas() {
+  fwCanvas.width = window.innerWidth;
+  fwCanvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeFwCanvas);
+resizeFwCanvas();
+
+function launchFireworks(bursts = 4) {
+  const colors = ["#ef4444", "#facc15", "#22c55e", "#3b82f6", "#ec4899", "#f97316"];
+  for (let b = 0; b < bursts; b++) {
+    setTimeout(() => {
+      const cx = fwCanvas.width * (0.2 + Math.random() * 0.6);
+      const cy = fwCanvas.height * (0.18 + Math.random() * 0.35);
+      for (let i = 0; i < 42; i++) {
+        const angle = (Math.PI * 2 * i) / 42 + (Math.random() - 0.5) * 0.2;
+        const speed = 2.5 + Math.random() * 4.5;
+        particles.push({
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          alpha: 1,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: 3 + Math.random() * 3
+        });
+      }
+      if (!fwAnimId) animateFireworks();
+    }, b * 240);
+  }
+}
+
+function animateFireworks() {
+  fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  particles = particles.filter(p => p.alpha > 0.02);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.08;
+    p.alpha *= 0.96;
+    fwCtx.globalAlpha = p.alpha;
+    fwCtx.fillStyle = p.color;
+    fwCtx.beginPath();
+    fwCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    fwCtx.fill();
+  });
+  fwCtx.globalAlpha = 1;
+  if (particles.length > 0) {
+    fwAnimId = requestAnimationFrame(animateFireworks);
+  } else {
+    fwAnimId = null;
+  }
+}
+
+// ============================================================================
+// 4. LẮNG NGHE LỆNH PHÒNG THI & DỮ LIỆU REALTIME TỪ FIREBASE
+// ============================================================================
+let currentStudentName = "";
+let currentStudentClass = "";
+let currentStudentKey = "";
+let allRecordsMap = {};
+
+// roomControlStatus: "waiting" (chờ giáo viên phát đề) | "active" (đang mở thi) | "stopped" (giáo viên đã dừng)
+let roomControlStatus = "waiting";
+let contestEnded = false;
+let stopReason = "";
+
+function normalizeKey(name, className) {
+  const n = name.trim().toLowerCase().replace(/\s+/g, " ");
+  const c = (className || "").trim().toLowerCase().replace(/\s+/g, "");
+  const raw = `${n}__${c}`;
+  return raw.replace(/[.#$\[\]\/]/g, "_");
+}
+
+function formatDuration(sec) {
+  const s = Math.max(1, Math.floor(sec));
+  const m = String(Math.floor(s / 60)).padStart(2, "0");
+  const r = String(s % 60).padStart(2, "0");
+  return `${m} phút ${r} giây`;
+}
+
+function formatClock(sec) {
+  const s = Math.max(0, Math.floor(sec));
+  const m = String(Math.floor(s / 60)).padStart(2, "0");
+  const r = String(s % 60).padStart(2, "0");
+  return `${m}:${r}`;
+}
+
+function loadLocalRecords() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) allRecordsMap = JSON.parse(raw);
+  } catch (e) {
+    allRecordsMap = {};
+  }
+}
+
+function saveLocalRecords() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(allRecordsMap));
+  } catch (e) {}
+}
+
+function setSyncStatus(text, type = "ok") {
+  const badges = [document.getElementById("syncStatusBadge"), document.getElementById("introSyncBadge")];
+  badges.forEach(b => {
+    if (!b) return;
+    b.textContent = text;
+    b.className = `sync-badge ${type}`;
+  });
+}
+
+function initFirebaseRealtimeListener() {
+  if (!studentsRef || !controlStatusRef) {
+    setSyncStatus("⚠️ Chế độ ngoại tuyến", "err");
+    roomControlStatus = "active";
+    evaluateContestStatus();
+    return;
+  }
+
+  db.ref(".info/connected").on("value", snap => {
+    if (snap.val() === true) {
+      setSyncStatus("🔥 Trực tuyến (Firebase Realtime)", "ok");
+    } else {
+      setSyncStatus("⏳ Đang kết nối Firebase...", "");
+    }
+  });
+
+  // Lắng nghe trạng thái phòng thi (chỉ đọc toan4_tong_hieu/control/status)
+  controlStatusRef.on("value", snapshot => {
+    const statusVal = snapshot.val();
+    roomControlStatus = statusVal || "waiting";
+    evaluateContestStatus();
+  }, error => {
+    console.error("Control read error:", error);
+    roomControlStatus = "waiting";
+    evaluateContestStatus();
+  });
+
+  // Lắng nghe điểm số toàn lớp theo thời gian thực
+  studentsRef.on("value", snapshot => {
+    const val = snapshot.val();
+    allRecordsMap = val ? val : {};
+    saveLocalRecords();
+    evaluateContestStatus();
+  }, error => {
+    console.error("Firebase read error:", error);
+    setSyncStatus("⚠️ Lỗi đọc dữ liệu Firebase", "err");
+    evaluateContestStatus();
+  });
+}
+
+function getSortedLeaderboard() {
+  const list = Object.values(allRecordsMap);
+  list.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.durationSec - b.durationSec;
+  });
+  return list;
+}
+
+function evaluateContestStatus() {
+  const list = getSortedLeaderboard();
+  const perfectCount = list.filter(item => Number(item.score) === MAX_SCORE).length;
+  const wasEnded = contestEnded;
+
+  const isTeacherStopped = roomControlStatus === "stopped";
+  const isWaitingForTeacher = roomControlStatus === "waiting";
+  const isSixPerfectReached = perfectCount >= TARGET_PERFECT_STUDENTS;
+
+  contestEnded = isTeacherStopped || isSixPerfectReached;
+  if (isTeacherStopped) stopReason = "teacher_stopped";
+  else if (isSixPerfectReached) stopReason = "six_perfect";
+  else stopReason = "";
+
+  const introBar = document.getElementById("introContestStatus");
+  const introText = document.getElementById("introContestText");
+  const introPill = document.getElementById("introPerfectCount");
+  const btnStart = document.getElementById("btnStartGame");
+
+  if (introPill) {
+    introPill.textContent = `Đã đạt 100%: ${perfectCount} / ${TARGET_PERFECT_STUDENTS} bạn`;
+  }
+
+  if (introBar && introText && btnStart) {
+    introBar.classList.remove("waiting", "ended");
+    btnStart.classList.remove("waiting-mode");
+
+    if (isTeacherStopped) {
+      introBar.classList.add("ended");
+      introText.innerHTML = `🔴 <strong>GIÁO VIÊN ĐÃ DỪNG CUỘC THI!</strong> Mời con xem Bảng Vàng tổng kết.`;
+      btnStart.disabled = true;
+      btnStart.textContent = "🔴 ĐÃ DỪNG LÀM BÀI";
+    } else if (isSixPerfectReached) {
+      introBar.classList.add("ended");
+      introText.innerHTML = `🏁 <strong>CUỘC THI ĐÃ KẾT THÚC!</strong> Đã có đủ <strong>${perfectCount} học sinh</strong> hoàn thành đúng 100%.`;
+      btnStart.disabled = true;
+      btnStart.textContent = "🏁 CUỘC THI ĐÃ KẾT THÚC";
+    } else if (isWaitingForTeacher) {
+      introBar.classList.add("waiting");
+      introText.innerHTML = `⏳ <strong>ĐANG CHỜ GIÁO VIÊN PHÁT ĐỀ...</strong> Con hãy điền sẵn Họ tên và Lớp bên dưới nhé!`;
+      btnStart.disabled = true;
+      btnStart.classList.add("waiting-mode");
+      btnStart.textContent = "⏳ CHỜ GIÁO VIÊN PHÁT ĐỀ";
+    } else {
+      introText.innerHTML = `🟢 <strong>ĐÃ PHÁT ĐỀ — MỜI CẢ LỚP VÀO THI!</strong> (Kết thúc khi GV dừng hoặc đủ ${TARGET_PERFECT_STUDENTS} bạn đạt 100%).`;
+      btnStart.disabled = false;
+      btnStart.textContent = "🚀 BẮT ĐẦU THI";
+    }
+  }
+
+  const sumBar = document.getElementById("summaryContestStatus");
+  const sumGoal = document.getElementById("summaryGoalText");
+  const sumPill = document.getElementById("summaryPerfectCount");
+  const btnPlayAgain = document.getElementById("btnPlayAgain");
+
+  if (sumPill) {
+    sumPill.textContent = `Đã đạt 100%: ${perfectCount} / ${TARGET_PERFECT_STUDENTS} bạn`;
+  }
+  if (sumBar && sumGoal && btnPlayAgain) {
+    sumBar.classList.remove("waiting", "ended");
+    if (isTeacherStopped) {
+      sumBar.classList.add("ended");
+      sumGoal.innerHTML = `🔴 <strong>GIÁO VIÊN ĐÃ DỪNG THỜI GIAN LÀM BÀI.</strong> Bảng xếp hạng dưới đây là kết quả chính thức!`;
+      btnPlayAgain.disabled = true;
+      btnPlayAgain.textContent = "🔴 GIÁO VIÊN ĐÃ DỪNG THI";
+    } else if (isSixPerfectReached) {
+      sumBar.classList.add("ended");
+      sumGoal.innerHTML = `🏁 <strong>CUỘC THI ĐÃ KẾT THÚC</strong> (Đã có ${perfectCount} bạn đạt 100%). Bảng xếp hạng dưới đây là kết quả chung cuộc!`;
+      btnPlayAgain.disabled = true;
+      btnPlayAgain.textContent = "🏁 ĐÃ KHÓA LƯỢT THI";
+    } else if (isWaitingForTeacher) {
+      sumBar.classList.add("waiting");
+      sumGoal.innerHTML = `⏳ Phòng thi đang tạm khóa chờ giáo viên phát đề lượt tiếp theo.`;
+      btnPlayAgain.disabled = true;
+      btnPlayAgain.textContent = "⏳ CHỜ GIÁO VIÊN PHÁT ĐỀ";
+    } else {
+      sumGoal.innerHTML = `🎯 Cuộc thi vẫn đang mở (Cần thêm <strong>${TARGET_PERFECT_STUDENTS - perfectCount} bạn</strong> đạt 100% hoặc chờ GV chốt sổ).`;
+      btnPlayAgain.disabled = false;
+      btnPlayAgain.textContent = "🔄 LÀM LẠI LƯỢT MỚI";
+    }
+  }
+
+  if (!wasEnded && contestEnded && document.getElementById("screenGame").classList.contains("active")) {
+    handleForcedStopDuringGameplay();
+  }
+
+  renderLeaderboardTable(list);
+}
+
+function renderLeaderboardTable(list) {
+  const tbody = document.getElementById("leaderboardBody");
+  if (!tbody) return;
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">Chưa có thí sinh nào hoàn thành lượt thi.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((item, idx) => {
+    const rank = idx + 1;
+    let medal = `#${rank}`;
+    if (rank === 1) medal = "🥇 Hạng 1";
+    else if (rank === 2) medal = "🥈 Hạng 2";
+    else if (rank === 3) medal = "🥉 Hạng 3";
+
+    const isMe = currentStudentKey && item.key === currentStudentKey;
+    const isPerfect = Number(item.score) === MAX_SCORE;
+    const rowCls = [isMe ? "me-row" : "", isPerfect ? "perfect-row" : ""].join(" ").trim();
+
+    return `<tr class="${rowCls}">
+      <td><strong>${medal}</strong></td>
+      <td>${escapeHtml(item.name)} ${isMe ? "<span style='color:#0284c7;font-size:12px;'>(Bạn)</span>" : ""}</td>
+      <td>${escapeHtml(item.className || "—")}</td>
+      <td><strong style="color:#b91c1c;">${item.score}</strong> / ${MAX_SCORE}</td>
+      <td>${formatDuration(item.durationSec)}</td>
+      <td><span class="badge-attempts">${item.attempts || 1} lượt</span></td>
+      <td>${isPerfect ? `<span class="badge-perfect">✔ Đạt 100%</span>` : `<span style="color:#64748b;">Đang cố gắng</span>`}</td>
+    </tr>`;
+  }).join("");
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+async function saveStudentRecordToFirebase(record) {
+  allRecordsMap[record.key] = record;
+  saveLocalRecords();
+  evaluateContestStatus();
+
+  if (!studentsRef) return;
+  try {
+    await studentsRef.child(record.key).set(record);
+    setSyncStatus("🔥 Đã lưu lên Firebase Realtime", "ok");
+  } catch (err) {
+    console.error("Firebase write error:", err);
+    setSyncStatus("⚠️ Lỗi lưu Firebase (Kiểm tra Rules)", "err");
+  }
+}
+
+// ============================================================================
+// 5. TRẠNG THÁI & LOGIC TRÒ CHƠI
+// ============================================================================
+let currentIndex = 0;
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let elapsedTimer = null;
+let gameStartTime = 0;
+let elapsedSeconds = 0;
+let answeredCurrent = false;
+let currentAnswerCorrect = false;
+let resultsLog = [];
+
+let selectedMcqIdx = null;
+let selectedRightMatch = null;
+let rightOptionsShuffled = [];
+let sortUserSlots = [null, null, null, null];
+let dragBlankVal = null;
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function startStopwatch() {
+  stopStopwatch();
+  gameStartTime = Date.now();
+  elapsedSeconds = 0;
+  document.getElementById("hudElapsed").textContent = "00:00";
+  elapsedTimer = setInterval(() => {
+    elapsedSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+    document.getElementById("hudElapsed").textContent = formatClock(elapsedSeconds);
+  }, 500);
+}
+
+function stopStopwatch() {
+  if (elapsedTimer) {
+    clearInterval(elapsedTimer);
+    elapsedTimer = null;
+  }
+}
+
+function startGame() {
+  if (roomControlStatus !== "active" || contestEnded) {
+    return;
+  }
+
+  const nameInput = document.getElementById("inputStudentName");
+  const classInput = document.getElementById("inputStudentClass");
+  const errEl = document.getElementById("loginError");
+
+  const rawName = nameInput.value.trim();
+  const rawClass = classInput.value.trim();
+
+  if (!rawName) {
+    errEl.style.display = "block";
+    nameInput.focus();
+    return;
+  }
+  errEl.style.display = "none";
+
+  currentStudentName = rawName;
+  currentStudentClass = rawClass;
+  currentStudentKey = normalizeKey(rawName, rawClass);
+
+  try {
+    localStorage.setItem("TOAN_4_LAST_PLAYER", JSON.stringify({ name: rawName, className: rawClass }));
+  } catch (e) {}
+
+  ensureAudio();
+  sfxClick();
+  startBgm();
+
+  currentIndex = 0;
+  score = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  resultsLog = [];
+
+  document.getElementById("hudPlayerName").textContent =
+    currentStudentClass ? `${currentStudentName} (${currentStudentClass})` : currentStudentName;
+
+  showScreen("screenGame");
+  startStopwatch();
+  renderQuestion();
+}
+
+function backToIntro() {
+  sfxClick();
+  stopStopwatch();
+  document.getElementById("reviewList").classList.remove("open");
+  showScreen("screenIntro");
+  evaluateContestStatus();
+}
+
+function openLeaderboardOnly() {
+  sfxClick();
+  stopStopwatch();
+  showScreen("screenSummary");
+  document.getElementById("summaryTopBadge").textContent = "🏆 BẢNG XẾP HẠNG TRẠNG NGUYÊN TOÁN HỌC 🏆";
+  if (stopReason === "teacher_stopped") {
+    document.getElementById("summaryMainHeading").textContent = "🔴 GIÁO VIÊN ĐÃ DỪNG LÀM BÀI — BẢNG VÀNG CHUNG CUỘC";
+  } else if (stopReason === "six_perfect") {
+    document.getElementById("summaryMainHeading").textContent = "🏁 ĐÃ ĐỦ 6 BẠN ĐẠT 100% — BẢNG VÀNG CHUNG CUỘC";
+  } else {
+    document.getElementById("summaryMainHeading").textContent = "BẢNG XẾP HẠNG TRỰC TIẾP (REALTIME)";
+  }
+  document.getElementById("sumRankTitle").textContent = "XẾP HẠNG THEO LƯỢT CHƠI CUỐI CÙNG";
+  document.getElementById("personalStatsGrid").style.display = "none";
+  document.getElementById("btnToggleReview").style.display = "none";
+  evaluateContestStatus();
+}
+
+async function handleForcedStopDuringGameplay() {
+  stopStopwatch();
+  const totalSec = Math.max(1, Math.floor((Date.now() - gameStartTime) / 1000));
+  if (currentStudentKey && currentStudentName) {
+    const prev = allRecordsMap[currentStudentKey];
+    const attempts = (prev && prev.attempts ? prev.attempts : 0) + 1;
+    const record = {
+      key: currentStudentKey,
+      name: currentStudentName,
+      className: currentStudentClass,
+      score: score,
+      correctCount: correctCount,
+      durationSec: totalSec,
+      attempts: attempts,
+      updatedAt: Date.now()
+    };
+    await saveStudentRecordToFirebase(record);
+  }
+
+  showScreen("screenSummary");
+  document.getElementById("personalStatsGrid").style.display = "grid";
+  document.getElementById("btnToggleReview").style.display = "none";
+  document.getElementById("summaryTopBadge").textContent = "🔔 HỆ THỐNG ĐÃ TỰ ĐỘNG THU BÀI";
+  document.getElementById("summaryMainHeading").textContent =
+    stopReason === "teacher_stopped"
+      ? `🔴 GIÁO VIÊN ĐÃ DỪNG LÀM BÀI! (ĐÃ THU ĐIỂM CỦA ${currentStudentName.toUpperCase()})`
+      : `🏁 ĐÃ CÓ ĐỦ 6 BẠN ĐẠT 100%! (ĐÃ THU ĐIỂM CỦA ${currentStudentName.toUpperCase()})`;
+
+  document.getElementById("sumRankTitle").textContent = "KẾT QUẢ ĐƯỢC GHI NHẬN TẠI THỜI ĐIỂM DỪNG";
+  document.getElementById("sumPlayerName").textContent =
+    currentStudentClass ? `${currentStudentName} (${currentStudentClass})` : currentStudentName;
+  document.getElementById("sumScore").textContent = `${score} / ${MAX_SCORE} điểm`;
+  document.getElementById("sumCorrect").textContent = `${correctCount} / 15 câu`;
+  document.getElementById("sumWrong").textContent = `${wrongCount} câu`;
+  const rec = allRecordsMap[currentStudentKey];
+  document.getElementById("sumAttempts").textContent = `${rec ? rec.attempts : 1} lượt`;
+  document.getElementById("sumTotalTime").textContent = formatDuration(totalSec);
+  evaluateContestStatus();
+}
+
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function renderQuestion() {
+  answeredCurrent = false;
+  currentAnswerCorrect = false;
+  selectedMcqIdx = null;
+  selectedRightMatch = null;
+  sortUserSlots = [null, null, null, null];
+  dragBlankVal = null;
+
+  const q = QUESTIONS[currentIndex];
+  document.getElementById("hudRoundName").textContent = q.round;
+  document.getElementById("hudProgressText").textContent = `${currentIndex + 1} / ${QUESTIONS.length}`;
+  document.getElementById("hudScore").textContent = score;
+  document.getElementById("hudProgressBar").style.width = `${((currentIndex + 1) / QUESTIONS.length) * 100}%`;
+
+  document.getElementById("qNumberLabel").textContent = `Câu ${q.id}`;
+  document.getElementById("qTypeLabel").textContent = q.typeLabel;
+  document.getElementById("qPrompt").textContent = q.prompt;
+
+  const passageBox = document.getElementById("qPassageBox");
+  passageBox.innerHTML = q.passage ? `<div class="q-passage">${q.passage}</div>` : "";
+
+  const area = document.getElementById("qInteractiveArea");
+  const actionRow = document.getElementById("qActionRow");
+  const fbBox = document.getElementById("feedbackBox");
+  fbBox.className = "feedback-box";
+  fbBox.style.display = "none";
+  actionRow.style.display = "flex";
+  document.getElementById("btnCheckAnswer").disabled = false;
+
+  if (q.type === "fill") {
+    let html = `<div class="fill-stage"><div class="idiom-display">`;
+    q.parts.forEach(part => {
+      if (typeof part === "string") {
+        html += `<span>${part}</span>`;
+      } else if (part.blank) {
+        const cls = part.short ? "blank-input short" : "blank-input";
+        if (part.suffix) {
+          html += `<span class="attached-word"><input type="text" id="fillInput" class="${cls}" maxlength="10" autocomplete="off" placeholder="?" /><span>${part.suffix}</span></span>`;
+        } else {
+          html += `<input type="text" id="fillInput" class="${cls}" maxlength="12" autocomplete="off" placeholder="?" />`;
+        }
+      }
+    });
+    html += `</div></div>`;
+    area.innerHTML = html;
+    setTimeout(() => {
+      const inp = document.getElementById("fillInput");
+      if (inp) {
+        inp.focus();
+        inp.addEventListener("keydown", e => {
+          if (e.key === "Enter" && !answeredCurrent) submitCurrentAnswer();
+        });
+      }
+    }, 60);
+  }
+  else if (q.type === "match") {
+    rightOptionsShuffled = shuffleArray([q.rightCorrect, ...q.rightDistractors]);
+    area.innerHTML = `
+      <div class="match-board" id="matchBoard">
+        <svg class="match-svg-layer" id="matchSvg"></svg>
+        <div class="match-col">
+          <div class="match-item target-left" id="leftTargetNode">🐓 ${q.leftTarget}</div>
+          <div class="match-item distractor-left">${q.leftOthers[0]}</div>
+          <div class="match-item distractor-left">${q.leftOthers[1]}</div>
+        </div>
+        <div></div>
+        <div class="match-col">
+          ${rightOptionsShuffled.map((txt, idx) => `
+            <div class="match-item right-option" id="rightNode_${idx}" onclick="selectRightMatch(${idx})">${txt}</div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+    setTimeout(drawMatchLine, 50);
+  }
+  else if (q.type === "mcq") {
+    const letters = ["A", "B", "C", "D"];
+    area.innerHTML = `
+      <div class="options-grid">
+        ${q.options.map((opt, idx) => `
+          <button class="option-btn" id="optBtn_${idx}" onclick="selectMcq(${idx})">
+            <span class="option-letter">${letters[idx]}</span>
+            <span>${opt}</span>
+          </button>
+        `).join("")}
+      </div>
+    `;
+  }
+  else if (q.type === "sort") {
+    area.innerHTML = `
+      <div class="sort-slots">
+        ${[0, 1, 2, 3].map(idx => `
+          <div class="sort-slot" id="sortSlot_${idx}"
+               ondragover="event.preventDefault()"
+               ondrop="handleDropSort(event, ${idx})"
+               onclick="clearSortSlot(${idx})">
+            <div class="sort-slot-num">BƯỚC ${idx + 1}</div>
+            <div class="sort-slot-val" id="sortSlotVal_${idx}">...</div>
+          </div>
+        `).join("")}
+      </div>
+      <div class="tile-bank" id="sortTileBank">
+        ${q.tiles.map((t, idx) => `
+          <div class="word-tile" id="sortTile_${idx}" draggable="true"
+               ondragstart="handleDragStart(event, '${t}', ${idx})"
+               onclick="clickSortTile('${t}', ${idx})">${t}</div>
+        `).join("")}
+      </div>
+    `;
+  }
+  else if (q.type === "drag_blank") {
+    area.innerHTML = `
+      <div class="fill-stage">
+        <div class="idiom-display">
+          <span>${q.beforeText}</span>
+          <div class="sort-slot" id="dragBlankSlot" style="min-width: 110px; min-height: 58px; display: inline-flex; padding: 6px 14px;"
+               ondragover="event.preventDefault()"
+               ondrop="handleDropBlank(event)"
+               onclick="clearDragBlank()">
+            <div class="sort-slot-val" id="dragBlankVal">?</div>
+          </div>
+          ${q.afterText ? `<span>${q.afterText}</span>` : ""}
+        </div>
+      </div>
+      <div class="tile-bank">
+        ${q.tiles.map((t, idx) => `
+          <div class="word-tile" id="blankTile_${idx}" draggable="true"
+               ondragstart="handleDragBlankStart(event, '${t}', ${idx})"
+               onclick="selectDragBlank('${t}', ${idx})">${t}</div>
+        `).join("")}
+      </div>
+    `;
+  }
+}
+
+// ============================================================================
+// 6. XỬ LÝ TƯƠNG TÁC TỪNG DẠNG BÀI
+// ============================================================================
+function selectMcq(idx) {
+  if (answeredCurrent) return;
+  sfxClick();
+  selectedMcqIdx = idx;
+  document.querySelectorAll(".option-btn").forEach((b, i) => {
+    b.classList.toggle("selected", i === idx);
+  });
+}
+
+function selectRightMatch(idx) {
+  if (answeredCurrent) return;
+  sfxClick();
+  selectedRightMatch = idx;
+  document.querySelectorAll(".right-option").forEach((el, i) => {
+    el.classList.toggle("selected", i === idx);
+  });
+  drawMatchLine();
+}
+
+function drawMatchLine(status = "active") {
+  const svg = document.getElementById("matchSvg");
+  const board = document.getElementById("matchBoard");
+  const leftEl = document.getElementById("leftTargetNode");
+  if (!svg || !board || !leftEl) return;
+
+  if (selectedRightMatch === null) {
+    svg.innerHTML = "";
+    return;
+  }
+  const rightEl = document.getElementById(`rightNode_${selectedRightMatch}`);
+  if (!rightEl) return;
+
+  const bRect = board.getBoundingClientRect();
+  const lRect = leftEl.getBoundingClientRect();
+  const rRect = rightEl.getBoundingClientRect();
+
+  const x1 = lRect.right - bRect.left;
+  const y1 = lRect.top + lRect.height / 2 - bRect.top;
+  const x2 = rRect.left - bRect.left;
+  const y2 = rRect.top + rRect.height / 2 - bRect.top;
+  const cx = (x1 + x2) / 2;
+
+  const strokeColor = status === "correct" ? "#16a34a" : status === "wrong" ? "#dc2626" : "#0284c7";
+  svg.innerHTML = `
+    <path d="M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}"
+          stroke="${strokeColor}" stroke-width="5" fill="none" stroke-linecap="round" />
+    <circle cx="${x1}" cy="${y1}" r="6" fill="${strokeColor}" />
+    <circle cx="${x2}" cy="${y2}" r="6" fill="${strokeColor}" />
+  `;
+}
+window.addEventListener("resize", () => {
+  if (QUESTIONS[currentIndex] && QUESTIONS[currentIndex].type === "match") {
+    const status = answeredCurrent ? (currentAnswerCorrect ? "correct" : "wrong") : "active";
+    drawMatchLine(status);
+  }
+});
+
+let draggedSortData = null;
+function handleDragStart(e, text, tileIdx) { draggedSortData = { text, tileIdx }; }
+function handleDropSort(e, slotIdx) {
+  e.preventDefault();
+  if (answeredCurrent || !draggedSortData) return;
+  placeSortTile(draggedSortData.text, draggedSortData.tileIdx, slotIdx);
+  draggedSortData = null;
+}
+function clickSortTile(text, tileIdx) {
+  if (answeredCurrent) return;
+  const tileEl = document.getElementById(`sortTile_${tileIdx}`);
+  if (tileEl.classList.contains("used")) return;
+  const emptySlot = sortUserSlots.findIndex(s => s === null);
+  if (emptySlot !== -1) placeSortTile(text, tileIdx, emptySlot);
+}
+function placeSortTile(text, tileIdx, slotIdx) {
+  sfxClick();
+  if (sortUserSlots[slotIdx] !== null) {
+    const prevTileIdx = sortUserSlots[slotIdx].tileIdx;
+    document.getElementById(`sortTile_${prevTileIdx}`).classList.remove("used");
+  }
+  sortUserSlots[slotIdx] = { text, tileIdx };
+  document.getElementById(`sortTile_${tileIdx}`).classList.add("used");
+  document.getElementById(`sortSlotVal_${slotIdx}`).textContent = text;
+  document.getElementById(`sortSlot_${slotIdx}`).classList.add("filled");
+}
+function clearSortSlot(slotIdx) {
+  if (answeredCurrent || sortUserSlots[slotIdx] === null) return;
+  sfxClick();
+  const prevTileIdx = sortUserSlots[slotIdx].tileIdx;
+  document.getElementById(`sortTile_${prevTileIdx}`).classList.remove("used");
+  sortUserSlots[slotIdx] = null;
+  document.getElementById(`sortSlotVal_${slotIdx}`).textContent = "...";
+  document.getElementById(`sortSlot_${slotIdx}`).classList.remove("filled");
+}
+
+let draggedBlankData = null;
+function handleDragBlankStart(e, text, idx) { draggedBlankData = { text, idx }; }
+function handleDropBlank(e) {
+  e.preventDefault();
+  if (answeredCurrent || !draggedBlankData) return;
+  selectDragBlank(draggedBlankData.text, draggedBlankData.idx);
+  draggedBlankData = null;
+}
+function selectDragBlank(text, idx) {
+  if (answeredCurrent) return;
+  sfxClick();
+  dragBlankVal = text;
+  document.querySelectorAll("[id^='blankTile_']").forEach((el, i) => {
+    el.classList.toggle("used", i === idx);
+  });
+  const slot = document.getElementById("dragBlankSlot");
+  const valEl = document.getElementById("dragBlankVal");
+  slot.classList.add("filled");
+  valEl.textContent = text;
+}
+function clearDragBlank() {
+  if (answeredCurrent || !dragBlankVal) return;
+  sfxClick();
+  dragBlankVal = null;
+  document.querySelectorAll("[id^='blankTile_']").forEach(el => el.classList.remove("used"));
+  document.getElementById("dragBlankSlot").classList.remove("filled");
+  document.getElementById("dragBlankVal").textContent = "?";
+}
+
+// ============================================================================
+// 7. CHẤM ĐIỂM TỪNG CÂU & HOÀN THÀNH LƯỢT THI
+// ============================================================================
+function submitCurrentAnswer() {
+  if (answeredCurrent) return;
+  const q = QUESTIONS[currentIndex];
+  let isCorrect = false;
+  let hasInput = false;
+
+  if (q.type === "fill") {
+    const inp = document.getElementById("fillInput");
+    const val = (inp ? inp.value : "").trim().toLowerCase();
+    if (!val) {
+      inp.focus();
+      return;
+    }
+    hasInput = true;
+    const blankObj = q.parts.find(p => typeof p === "object" && p.blank);
+    isCorrect = blankObj.answers.some(ans => ans.toLowerCase() === val);
+    inp.disabled = true;
+    inp.classList.add(isCorrect ? "correct" : "wrong");
+  }
+  else if (q.type === "match") {
+    if (selectedRightMatch === null) return;
+    hasInput = true;
+    const chosenText = rightOptionsShuffled[selectedRightMatch];
+    isCorrect = chosenText === q.rightCorrect;
+    const rNode = document.getElementById(`rightNode_${selectedRightMatch}`);
+    rNode.classList.add(isCorrect ? "matched-ok" : "matched-err");
+    drawMatchLine(isCorrect ? "correct" : "wrong");
+    if (!isCorrect) {
+      const correctIdx = rightOptionsShuffled.indexOf(q.rightCorrect);
+      if (correctIdx !== -1) {
+        document.getElementById(`rightNode_${correctIdx}`).classList.add("matched-ok");
+      }
+    }
+  }
+  else if (q.type === "mcq") {
+    if (selectedMcqIdx === null) return;
+    hasInput = true;
+    isCorrect = selectedMcqIdx === q.correctIndex;
+    document.querySelectorAll(".option-btn").forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === q.correctIndex) btn.classList.add("correct");
+      else if (idx === selectedMcqIdx && !isCorrect) btn.classList.add("wrong");
+    });
+  }
+  else if (q.type === "sort") {
+    if (sortUserSlots.some(s => s === null)) return;
+    hasInput = true;
+    const userArr = sortUserSlots.map(s => s.text);
+    isCorrect = userArr.every((v, i) => v === q.correctOrder[i]);
+  }
+  else if (q.type === "drag_blank") {
+    if (!dragBlankVal) return;
+    hasInput = true;
+    isCorrect = dragBlankVal === q.correctTile;
+  }
+
+  if (!hasInput) return;
+
+  answeredCurrent = true;
+  currentAnswerCorrect = isCorrect;
+  document.getElementById("qActionRow").style.display = "none";
+
+  const fbBox = document.getElementById("feedbackBox");
+  const fbMsg = document.getElementById("feedbackMsg");
+  const fbSub = document.getElementById("feedbackSub");
+
+  if (isCorrect) {
+    correctCount++;
+    score += 10;
+    document.getElementById("hudScore").textContent = score;
+    resultsLog.push({ id: q.id, prompt: q.prompt, status: "correct", answer: q.fullDisplay });
+    sfxWin();
+    launchFireworks(3);
+    fbBox.className = "feedback-box success";
+    fbBox.style.display = "flex";
+    fbMsg.textContent = "🎉 Chúc mừng con! Con giỏi lắm!";
+    fbSub.textContent = `Đáp án chính xác: ${q.fullDisplay}`;
+  } else {
+    wrongCount++;
+    resultsLog.push({ id: q.id, prompt: q.prompt, status: "wrong", answer: q.fullDisplay });
+    sfxLose();
+    fbBox.className = "feedback-box error";
+    fbBox.style.display = "flex";
+    fbMsg.textContent = "💪 Con hãy cố gắng ở câu tiếp theo nhé!";
+    fbSub.textContent = `Đáp án đúng là: ${q.fullDisplay}`;
+  }
+
+  document.getElementById("btnNextQuestion").textContent =
+    currentIndex === QUESTIONS.length - 1 ? "🏆 Nộp bài & Xem Bảng Xếp Hạng" : "Câu tiếp theo ➔";
+}
+
+function nextQuestion() {
+  sfxClick();
+  if (currentIndex < QUESTIONS.length - 1) {
+    currentIndex++;
+    renderQuestion();
+  } else {
+    finishGame();
+  }
+}
+
+async function finishGame() {
+  stopStopwatch();
+  const totalSec = Math.max(1, Math.floor((Date.now() - gameStartTime) / 1000));
+
+  const prev = allRecordsMap[currentStudentKey];
+  const attempts = (prev && prev.attempts ? prev.attempts : 0) + 1;
+  const record = {
+    key: currentStudentKey,
+    name: currentStudentName,
+    className: currentStudentClass,
+    score: score,
+    correctCount: correctCount,
+    durationSec: totalSec,
+    attempts: attempts,
+    updatedAt: Date.now()
+  };
+
+  showScreen("screenSummary");
+  document.getElementById("personalStatsGrid").style.display = "grid";
+  document.getElementById("btnToggleReview").style.display = "inline-block";
+  document.getElementById("summaryTopBadge").textContent = "🏆 BẢNG VÀNG VINH DANH TRẠNG NGUYÊN 🏆";
+  document.getElementById("summaryMainHeading").textContent = `CHÚC MỪNG ${currentStudentName.toUpperCase()} ĐÃ HOÀN THÀNH!`;
+
+  sfxWin();
+  launchFireworks(score === MAX_SCORE ? 7 : 4);
+
+  let rankText = "CẦN CỐ GẮNG THÊM";
+  if (score === MAX_SCORE) rankText = "🌟 TRẠNG NGUYÊN TOÀN NĂNG (ĐẠT 100%) 🌟";
+  else if (correctCount >= 13) rankText = "TRẠNG NGUYÊN XUẤT SẮC";
+  else if (correctCount >= 11) rankText = "TRẠNG NGUYÊN TÀI GIỎI";
+  else if (correctCount >= 9) rankText = "TRẠNG NGUYÊN TIẾN BỘ";
+
+  document.getElementById("sumRankTitle").textContent = rankText;
+  document.getElementById("sumPlayerName").textContent =
+    currentStudentClass ? `${currentStudentName} (${currentStudentClass})` : currentStudentName;
+  document.getElementById("sumScore").textContent = `${score} / ${MAX_SCORE} điểm`;
+  document.getElementById("sumCorrect").textContent = `${correctCount} / 15 câu`;
+  document.getElementById("sumWrong").textContent = `${wrongCount} câu`;
+  document.getElementById("sumAttempts").textContent = `${attempts} lượt`;
+  document.getElementById("sumTotalTime").textContent = formatDuration(totalSec);
+
+  const revEl = document.getElementById("reviewList");
+  revEl.innerHTML = resultsLog.map(item => {
+    const badge = item.status === "correct"
+      ? `<span style="color:#15803d;font-weight:900;">✔ Đúng</span>`
+      : `<span style="color:#dc2626;font-weight:900;">✘ Chưa đúng</span>`;
+    return `<div class="review-row">
+      <strong>Câu ${item.id}:</strong> ${badge} — <span style="color:#334155;">${item.prompt}</span><br/>
+      <span style="color:#0369a1;font-weight:800;">Đáp án: ${item.answer}</span>
+    </div>`;
+  }).join("");
+
+  await saveStudentRecordToFirebase(record);
+}
+
+function toggleReviewList() {
+  sfxClick();
+  document.getElementById("reviewList").classList.toggle("open");
+}
+
+// ============================================================================
+// 8. KHỞI TẠO KHI MỞ TRANG
+// ============================================================================
+window.addEventListener("DOMContentLoaded", () => {
+  loadLocalRecords();
+  try {
+    const last = JSON.parse(localStorage.getItem("TOAN_4_LAST_PLAYER") || "null");
+    if (last && last.name) {
+      document.getElementById("inputStudentName").value = last.name;
+      document.getElementById("inputStudentClass").value = last.className || "";
+    }
+  } catch (e) {}
+  evaluateContestStatus();
+  initFirebaseRealtimeListener();
+});
+</script>
+</body>
+</html>
